@@ -14,6 +14,7 @@ public class PControl : MonoBehaviour
     Transform cameraTrn;
 
     // movement
+    [SerializeField]
     float horizontal;
     float vertical;
     float movementSpeed;
@@ -54,7 +55,6 @@ public class PControl : MonoBehaviour
     {
         //movement- jump
         //animations
-        pAnim.SetBool("isIdle", true);
         //interactions
         //attack
 
@@ -67,18 +67,18 @@ public class PControl : MonoBehaviour
         cameraTrn.localRotation = Quaternion.Euler(cameraX, 0, 0);
 
 
-        // movement //CREATE DELAY IN MOVE TO MATCH ANIMATION
+        // movement
         horizontal = Input.GetAxis("Horizontal") * movementSpeed * Time.deltaTime;
         vertical = Input.GetAxis("Vertical") * movementSpeed * Time.deltaTime;
         loc = transform.forward * vertical + transform.right * horizontal;
         controller.Move(loc);
-        if ((horizontal == 0) && (vertical == 0))
+        if ((Mathf.Abs(horizontal)>=0.01f)||(Mathf.Abs(vertical)>=0.01f)) //delay for realistic animation
         {
-            pAnim.SetBool("isWalking", false);
+            pAnim.SetBool("isWalking", true);
         }
         else
         {
-            pAnim.SetBool("isWalking", true);
+            pAnim.SetBool("isWalking", false);
         }
 
         //Gravity 
@@ -100,7 +100,8 @@ public class PControl : MonoBehaviour
         }
         controller.Move(velocity * Time.deltaTime); // the control over gravity and jumping velocity of player
 
-        // Crouching
+        // Crouching OPTIONAL 
+        /*
         if (Input.GetKeyDown(CrouchKey))
         {
             if (!isCrouching)
@@ -114,7 +115,39 @@ public class PControl : MonoBehaviour
                 cpHeight = 2f;
             }
         }
-        controller.height = Mathf.Lerp(controller.height, cpHeight, 10f * Time.deltaTime);
+        controller.height = Mathf.Lerp(controller.height, cpHeight, 10f * Time.deltaTime);*/
 
+        // Attack
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            PAttack("Regular");
+        }
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            PAttack("Warcry");
+        }
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            PAttack("Shield");
+        }
+
+    }
+    private void PAttack(string AttType) // Attacking Func
+    {
+        //SkillAttack - normal attack, SkillWarcry - active skill 1, SkillShield - active skill 2
+        if (AttType == "Regular")
+        {
+            pAnim.SetTrigger("SkillAttack");
+        }
+        else if (AttType == "Warcry")
+        {
+            pAnim.SetTrigger("SkillWarcry"); 
+        }
+        else if(AttType=="Shield")
+        {
+            pAnim.SetTrigger("SkillShield"); 
+        }
+                                       
     }
 }
